@@ -1,0 +1,15 @@
+{
+    "HTTP_params": {
+        "username": "admin",
+        "password": "admin"
+    },
+    "injection": {
+        "$data": "password",
+        "$table": "users",
+        "$filter": "username",
+        "$value": "admin"
+    },
+    "options": {
+        "SQLi_in_cookie": "TrackingId=sqlihere<>; session=MD5-STUFF"
+    }
+}

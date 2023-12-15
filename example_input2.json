@@ -1,0 +1,11 @@
+{
+    "HTTP_params": {
+        "category": "Gifts<>"
+    },
+    "injection": {
+        "$data": "password",
+        "$table": "users",
+        "$filter": "username",
+        "$value": "administrator"
+    }
+}
