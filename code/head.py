@@ -10,12 +10,14 @@ def process(URL: str, TYPE: str, METHOD: str, PAYLOAD: str) -> int:
 
     prepare_functions = {
         "async_mode":{
-            "basic": lambda url, method, static, arr_data, SQLtype : asyncio.run(req.prepare_async_requests(url, method, static, arr_data, SQLtype)),
-            "error": lambda url, method, static, arr_data, SQLtype : asyncio.run(req.prepare_async_requests(url, method, static, arr_data, SQLtype))
+            "basic": lambda url, method, static, arr_data, SQLtype : asyncio.run(req.prepare_async_requests_BE(url, method, static, arr_data, SQLtype)),
+            "error": lambda url, method, static, arr_data, SQLtype : asyncio.run(req.prepare_async_requests_BE(url, method, static, arr_data, SQLtype)),
+            "time": lambda url, method, static, arr_data, SQLtype : asyncio.run(req.prepare_async_requests_T(url, method, static, arr_data, SQLtype))
         },
         "sync_mode":{
-            "basic": lambda url, method, static, arr_data, SQLtype : req.prepare_sync_requests(url, method, static, arr_data, SQLtype),
-            "error": lambda url, method, static, arr_data, SQLtype : req.prepare_sync_requests(url, method, static, arr_data, SQLtype)
+            "basic": lambda url, method, static, arr_data, SQLtype : req.prepare_sync_requests_BE(url, method, static, arr_data, SQLtype),
+            "error": lambda url, method, static, arr_data, SQLtype : req.prepare_sync_requests_BE(url, method, static, arr_data, SQLtype),
+            "time": lambda url, method, static, arr_data, SQLtype : req.prepare_sync_requests_T(url, method, static, arr_data, SQLtype)
         }
     }
 

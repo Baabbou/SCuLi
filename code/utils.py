@@ -4,10 +4,14 @@ import time
 import json
 
 # ------------------ GLOBAL VARS ----------------------
-# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-&#$!"
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ _-&#$!%*~<>"
+# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 # ALPHABET = "0123456789abcdef"
+# ALPHABET = [str(i) for i in range(30, 121)]
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+}
 
 ARGS = None
 QUERY_COUNT = 0
@@ -40,7 +44,7 @@ def check_args(args: dict) -> bool:
         return False
 
     payload = args.payload
-    if not "<index>" in payload and "<char>" in payload:
+    if not ("<index>" in payload and "<char>" in payload):
         print("[error] Invalid arguments: Payload missing argument =>\n\t['<index>', '<char>'] are required")
         return False
 
@@ -73,6 +77,12 @@ def select_reference_len(arr_len_responses: list) -> int:
     if val1 == val2 or val1 == val3:
         return val1
     return val2
+
+
+def select_reference_time(arr_time_responses: list) -> int:
+    # Adapt to your needs
+    minimum = min(*arr_time_responses)
+    return 2
 
 
 def countdown() -> None:
