@@ -19,6 +19,7 @@ Be careful when setting `--speed` option, `len(ALPHABET)*password_size` requests
 
 When using `--delay` and `--speed`, the delay is exectued between each password index exfiltration.
 
+<br>
 
 # Install
 
@@ -29,11 +30,12 @@ git clone https://github.com/Baabbou/SCuLi.git
 cd SCuLi
 pip3 install -r requirements.txt
 ```
+<br>
 
 # Uses
 
 **Help:**
-```bash
+```
 $ python3 ./SCuLi.py --help
 usage: SCuLi [-h] [-d DELAY] [--cookie COOKIE] [--proxy PROXY] [-i INPUT] [-s] URL type method payload
 
