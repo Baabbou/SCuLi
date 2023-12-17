@@ -1,12 +1,6 @@
 {
-    "HTTP_params": {
+    "params": {
         "username": "admin<>",
         "password": "any"
-    },
-    "injection": {
-        "<data>": "password",
-        "<table>": "users",
-        "<filter>": "username",
-        "<value>": "admin"
     }
 }
