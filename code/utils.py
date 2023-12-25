@@ -4,8 +4,8 @@ import time
 import json
 
 # ------------------ GLOBAL VARS ----------------------
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ _-&#$!%*~<>"
-# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
+# ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ _-&#$!%*~<>"
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 # ALPHABET = "0123456789abcdef"
 # ALPHABET = [str(i) for i in range(30, 121)]
 

@@ -45,7 +45,7 @@ positional arguments:
   URL
   type                  Can be: basic, error, time, xOAST
   method                Can be: GET or POST
-  payload               Example: `' AND SUBSTR((SELECT <data> FROM <table> WHERE <filter>='<value>'),<index>,1)='<char>'--`
+  payload               Example: `' AND SUBSTR((SELECT passwd FROM users WHERE uname='admin'),<index>,1)='<char>'--`
 
 options:
   -h, --help            show this help message and exit
@@ -54,7 +54,7 @@ options:
   --cookie COOKIE       Example: `PHPSESSID=JWT; csrf=MD5-STUFF`
   --proxy PROXY         Example: `http://127.0.0.1:8080`
   -i INPUT, --input INPUT
-                        Example: `./example_input.json`
+                        Example: `./input.json`
   -s, --speed           Request are now made as async requests
 
 Don't hack good people pls.

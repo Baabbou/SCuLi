@@ -37,6 +37,8 @@ def process(URL: str, TYPE: str, METHOD: str, PAYLOAD: str) -> int:
                     request.cookie = in_request["cookie"]
                     if "<>" in request.cookie:
                         request.SQLi = "cookie"
+                elif utils.ARGS.cookie:
+                    request.cookie = utils.ARGS.cookie
         return request
 
     request = __init_request()
@@ -69,7 +71,7 @@ def process(URL: str, TYPE: str, METHOD: str, PAYLOAD: str) -> int:
                 arr_data.append(cookie)
 
         if request.SQLi == "params":
-            exfiltred = prepare_functions[mode][TYPE](URL, METHOD, utils.ARGS.cookie, arr_data, SQLtype="HTTP")
+            exfiltred = prepare_functions[mode][TYPE](URL, METHOD, request.cookie, arr_data, SQLtype="HTTP")
         if request.SQLi == "cookie":
             exfiltred = prepare_functions[mode][TYPE](URL, METHOD, request.params, arr_data, SQLtype="Cookie")
 
@@ -82,5 +84,3 @@ def process(URL: str, TYPE: str, METHOD: str, PAYLOAD: str) -> int:
             break
     utils.TIMING = round(time.time() - total_start, 2)
     return exfiltred_data
-
-
